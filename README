@@ -12,9 +12,14 @@ To compile this driver, you'll need to have pam installed
 
 Usage
 
-    ns_pam auth servicename username ?password?
+    ns_authpam auth ?-delay ms? ?-tty t? ?-rhost h? ?-authtok t? servicename username password
 
     Return 1 if authenticated, 0 if not
+
+    -delay   - specify how long to wait in case failure, miliseconds
+    -tty     - tty if pam services requires it
+    -authtok - token to pass to pam module
+    -rhost   - remote host or IP
 
 Authors
      Vlad Seryakov vlad@crystalballinc.com

@@ -28,8 +28,6 @@
 #include "ns.h"
 #include <security/pam_appl.h>
 
-NS_RCSID("$Header$");
-
 struct pam_cred {
   char *username;
   char *password;
@@ -68,11 +66,7 @@ static int AddCmds(Tcl_Interp *interp, void *arg);
 int
 Ns_ModuleInit(char *server, char *module)
 {
-    char   *path;
-
-    path = Ns_ConfigGetPath(server,module,NULL);
     Ns_TclRegisterTrace(server, AddCmds, 0, NS_TCL_TRACE_CREATE);
-
     return NS_OK;
 }
 
@@ -229,9 +223,13 @@ AuthObjCmd(ClientData arg, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
 
         rc = pam_start(service, user, &conv, &hdl);
 
+#if !defined(__APPLE__)
+	/* is not available in Mac OS X 10.7.4 although post seem to
+	   indicate that is is in 10.6 ore newer */
         if (delay > 0) {
             pam_fail_delay(hdl, delay);
         }
+#endif
 
         if (rc == PAM_SUCCESS) {
             if (rhost != NULL) {

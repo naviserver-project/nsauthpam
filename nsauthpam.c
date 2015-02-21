@@ -41,7 +41,7 @@ NS_EXPORT int Ns_ModuleVersion = 1;
  */
 
 static Tcl_ObjCmdProc AuthObjCmd;
-static int AddCmds(Tcl_Interp *interp, void *arg);
+static Ns_TclTraceProc AddCmds;
 
 
 /*
@@ -88,9 +88,9 @@ Ns_ModuleInit(char *server, char *module)
  */
 
 static int
-AddCmds(Tcl_Interp *interp, void *arg)
+AddCmds(Tcl_Interp *interp, const void *arg)
 {
-    Tcl_CreateObjCommand(interp, "ns_authpam", AuthObjCmd, arg, NULL);
+    Tcl_CreateObjCommand(interp, "ns_authpam", AuthObjCmd, (ClientData)arg, NULL);
 
     return NS_OK;
 }

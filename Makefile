@@ -10,7 +10,7 @@ MOD      =  nsauthpam.so
 #
 # Objects to build.
 #
-OBJS     = nsauthpam.o
+MODOBJS     = nsauthpam.o
 
 MODLIBS	 = -lpam
 

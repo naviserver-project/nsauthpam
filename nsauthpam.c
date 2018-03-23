@@ -34,7 +34,7 @@ struct pam_cred {
 };
 
 NS_EXPORT int Ns_ModuleVersion = 1;
-
+NS_EXPORT Ns_ModuleInitProc Ns_ModuleInit;
 
 /*
  * Static functions defined in this file.
@@ -64,7 +64,7 @@ static Ns_TclTraceProc AddCmds;
  */
 
 int
-Ns_ModuleInit(char *server, char *module)
+Ns_ModuleInit(const char *server, const char *module)
 {
     Ns_TclRegisterTrace(server, AddCmds, 0, NS_TCL_TRACE_CREATE);
     return NS_OK;
@@ -158,7 +158,7 @@ pam_conv(int msgs, const struct pam_message **msg, struct pam_response **resp, v
  *   Verifies username and pasword with specified PAM service
  *
  * Results:
- *      TCL_ERROR if error occured, otherwise TCL_OK.
+ *      TCL_ERROR if error occurred, otherwise TCL_OK.
  *
  * Side effects:
  *      None.

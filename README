@@ -16,7 +16,7 @@ Usage
 
     Return 1 if authenticated, 0 if not
 
-    -delay   - specify how long to wait in case failure, miliseconds
+    -delay   - specify how long to wait in case failure, milliseconds
     -tty     - tty if pam services requires it
     -authtok - token to pass to pam module
     -rhost   - remote host or IP

@@ -63,7 +63,7 @@ static Ns_TclTraceProc AddCmds;
  *----------------------------------------------------------------------
  */
 
-int
+Ns_ReturnCode
 Ns_ModuleInit(const char *server, const char *module)
 {
     Ns_TclRegisterTrace(server, AddCmds, 0, NS_TCL_TRACE_CREATE);
@@ -87,7 +87,7 @@ Ns_ModuleInit(const char *server, const char *module)
  *----------------------------------------------------------------------
  */
 
-static int
+static Ns_ReturnCode
 AddCmds(Tcl_Interp *interp, const void *arg)
 {
     Tcl_CreateObjCommand(interp, "ns_authpam", AuthObjCmd, (ClientData)arg, NULL);

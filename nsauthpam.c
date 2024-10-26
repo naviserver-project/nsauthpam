@@ -114,9 +114,9 @@ AddCmds(Tcl_Interp *interp, const void *arg)
  *
  * PAM conversation function
  * Accepts: number of messages
- *	    vector of messages
- *	    pointer to response return
- *	    application data
+ *          vector of messages
+ *          pointer to response return
+ *          application data
  *
  * Results:
  *      PAM_SUCCESS if OK, response vector filled in, else PAM_CONV_ERR
@@ -235,7 +235,7 @@ AuthObjCmd(ClientData UNUSED(arg), Tcl_Interp *interp, TCL_SIZE_T objc, Tcl_Obj 
         rc = pam_start(service, user, &conv, &hdl);
 
 #if !defined(__APPLE__)
-	/*
+        /*
          * The function pam_fail_delay() is not available in macOS 10.7.4 to
          * macOS 15.0.1
          */

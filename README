@@ -4,8 +4,9 @@ vlad@crystalballinc.com
 neumann@wu-wien.ac.at
 
 This is NaviServer module that implements interface to the pam
-(pluggable authentication module) library. The modulesCompiles with
-Tcl 8.5, 8.6 and 9.0.
+(pluggable authentication module) library.
+
+Compatibility: The module compiles with Tcl 8.5, 8.6 and 9.0.
 
 /*--------------------------------------------------------------------*/
 

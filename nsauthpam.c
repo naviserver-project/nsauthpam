@@ -27,6 +27,17 @@
 
 #include "ns.h"
 #include <security/pam_appl.h>
+#include <security/pam_modules.h>
+
+#ifndef TCL_SIZE_T
+/*
+ * Must be a NaviServer version 4.99.*
+ */
+# define TCL_SIZE_T           int
+# define TCL_SIZE_MAX         INT_MAX
+# define TCL_OBJCMDPROC_T     Tcl_ObjCmdProc
+# define TCL_CREATEOBJCOMMAND Tcl_CreateObjCommand
+#endif
 
 struct pam_cred {
   char *username;
@@ -40,7 +51,7 @@ NS_EXPORT Ns_ModuleInitProc Ns_ModuleInit;
  * Static functions defined in this file.
  */
 
-static Tcl_ObjCmdProc AuthObjCmd;
+static TCL_OBJCMDPROC_T AuthObjCmd;
 static Ns_TclTraceProc AddCmds;
 
 
@@ -64,7 +75,7 @@ static Ns_TclTraceProc AddCmds;
  */
 
 Ns_ReturnCode
-Ns_ModuleInit(const char *server, const char *module)
+Ns_ModuleInit(const char *server, const char *UNUSED(module))
 {
     Ns_TclRegisterTrace(server, AddCmds, 0, NS_TCL_TRACE_CREATE);
     return NS_OK;
@@ -79,7 +90,7 @@ Ns_ModuleInit(const char *server, const char *module)
  *      Register module commands for a freshly created Tcl interp.
  *
  * Results:
- *      NS_OK or NS_ERROR.
+ *      TCL_OK
  *
  * Side effects:
  *      None.
@@ -87,12 +98,12 @@ Ns_ModuleInit(const char *server, const char *module)
  *----------------------------------------------------------------------
  */
 
-static Ns_ReturnCode
+static int
 AddCmds(Tcl_Interp *interp, const void *arg)
 {
-    Tcl_CreateObjCommand(interp, "ns_authpam", AuthObjCmd, (ClientData)arg, NULL);
+    (void)TCL_CREATEOBJCOMMAND(interp, "ns_authpam", AuthObjCmd, (ClientData)arg, NULL);
 
-    return NS_OK;
+    return TCL_OK;
 }
 
 
@@ -121,11 +132,11 @@ pam_conv(int msgs, const struct pam_message **msg, struct pam_response **resp, v
 {
     int i;
     struct pam_cred *cred = (struct pam_cred *) appdata;
-    struct pam_response *reply = malloc(sizeof (struct pam_response) * msgs);
+    struct pam_response *reply = malloc(sizeof (struct pam_response) * (size_t)msgs);
 
     for (i = 0; i < msgs; i++) {
         switch (msg[i]->msg_style) {
-        case PAM_PROMPT_ECHO_ON:	/* assume want user name */
+        case PAM_PROMPT_ECHO_ON:	/* assume want username */
             reply[i].resp_retcode = PAM_SUCCESS;
             reply[i].resp = strdup(cred->username);
             break;
@@ -167,7 +178,7 @@ pam_conv(int msgs, const struct pam_message **msg, struct pam_response **resp, v
  */
 
 static int
-AuthObjCmd(ClientData arg, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
+AuthObjCmd(ClientData UNUSED(arg), Tcl_Interp *interp, TCL_SIZE_T objc, Tcl_Obj *const* objv)
 {
     int rc, cmd;
 
@@ -177,7 +188,7 @@ AuthObjCmd(ClientData arg, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
 
     static const char *sCmd[] = {
         "auth",
-        0
+        NULL
     };
 
     if (objc < 3) {
@@ -193,7 +204,7 @@ AuthObjCmd(ClientData arg, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
         pam_handle_t *hdl;
         struct pam_conv conv;
         struct pam_cred cred;
-        int delay = 0;
+        unsigned int delay = 0;
         char *user = NULL, *password = NULL, *service = NULL;
         char *rhost = NULL, *authtok = NULL, *tty = NULL;
 
@@ -224,8 +235,10 @@ AuthObjCmd(ClientData arg, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
         rc = pam_start(service, user, &conv, &hdl);
 
 #if !defined(__APPLE__)
-	/* is not available in Mac OS X 10.7.4 although post seem to
-	   indicate that is is in 10.6 ore newer */
+	/*
+         * The function pam_fail_delay() is not available in macOS 10.7.4 to
+         * macOS 15.0.1
+         */
         if (delay > 0) {
             pam_fail_delay(hdl, delay);
         }
@@ -255,3 +268,11 @@ AuthObjCmd(ClientData arg, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
     return TCL_OK;
 }
 
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 4
+ * fill-column: 78
+ * indent-tabs-mode: nil
+ * End:
+ */

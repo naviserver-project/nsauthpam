@@ -1,8 +1,11 @@
 PAM Authentication Module for NaviServer 4.x
-Release 1.0
+Release 1.1
 vlad@crystalballinc.com
+neumann@wu-wien.ac.at
 
-This is NaviServer module that implements interface to pam library
+This is NaviServer module that implements interface to the pam
+(pluggable authentication module) library. The modulesCompiles with
+Tcl 8.5, 8.6 and 9.0.
 
 /*--------------------------------------------------------------------*/
 
